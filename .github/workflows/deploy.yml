@@ -1,0 +1,21 @@
+name: Deploy penky
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-penky
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, mac-server]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t penky:latest .
+      - name: Restart container
+        run: docker compose -f /home/user/server/docker-compose.yml up -d --no-deps --no-build --force-recreate penky
